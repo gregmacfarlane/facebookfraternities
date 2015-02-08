@@ -1,0 +1,11 @@
+# Data folder
+There are two types of data associated with this project:
+	1. Data with no privacy concerns
+	2. Data with privacy concerns
+
+The first type of data will be saved in this folder directly.  The second type
+will be stored in the PRIVATEDATA folder but will not be committed to the
+repository.
+
+It is not possible to complete the analysis without the PRIVATEDATA folder, but
+we hope to be transparent in our methods by hosting this code on GitHub
