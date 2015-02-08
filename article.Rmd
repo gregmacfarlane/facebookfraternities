@@ -1,0 +1,33 @@
+---
+title: "Peer influences in air travel behavior: A social autoregressive analysis"
+author: Gregory S. Macfarlane, Thomas A. Wall, Bingling Zhang, and Kari E. Watkins
+bibliography: bibliography/bibliography.bib
+csl: bibliography/elsevier-harvard.csl 
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+---
+
+**Abstract**
+Social networks can influence travel in two distinct ways: first, people often make trips to see people they know through work or life (exogenous effects); or they make trips that are similar to those taken by friends or family (endogenous effects). In spite of this, traditional models have not always made use of social network data, because information on social networks is both difficult to collect and challenging to implement in models. In this paper, we appropriate techniques developed for spatial data (specifically, a spatial Durbin count model) to construct a trip generation model for socially linked observations. We train this model on data collected through a web survey that interacts with the Facebook application programming interface (API) to capture respondents’ “friends” lists. We construct a set of “social weights” matrices that captures the social tie-strength between observations. A matrix that weights two observations by the number of their mutual friends provides the maximum model likelihood; this model further suggests that a non-social model may result in erroneous interpretations of the link between demographic characteristics and trip generation.
+
+Introduction
+================================================
+The goal of a modern activity-based travel model is to accurately represent travel behavior choices on a microscopic level [@Bhat2003]. As researchers have pursued this goal, they have sought to incorporate individual behavioral patterns of various types. For example, researchers have built models that allow different classes of people to place different values on goods [@Walker2002], that capture idiosyncratic preferences for a particular lifestyle [@Cao2007a], or that allow multiple decisions to be made either sequentially or simultaneously [@Bhat2006; @Pinjari2011].
+
+Another dimension of individual behavior that is receiving increasing attention from transportation researchers is the role that peer or social networks play in travel choices. These influences may come in several ways:
+
+  - *Direct*: each individual chooses activities or destinations where their social connections are, or where they will be.
+  - *Indirect*: an individual’s social connections influence their choice of destinations or activities.
+  - *Endogenous*: individuals construct their social networks with others of shared interest or experience.
+  
+The distinction between these elements can be subtle. Imagine two individualswho are socially connected to each other. If these individuals meet for dinner, this is a direct influence, because each person’s choice of activity and destination is dependent on the other person being there. On the other hand if one recommends a restaurant to the other, this is an indirect influence because the restaurant entered one’s choice set through the other’s experience and not his own. Finally, if the two know each other through another shared destination or interest (e.g. workplace, neighborhood, church), the restaurant in question may have entered their choice set by being near one of these destinations.
+
+These elements are important to capture in activity-based models for several reasons. First, they are a natural element of every day behavior. But more importantly, an activity model that does not consider them might produce spurious or unreliable predictions, because standard econometric assumptions that permit consistency and validity may not apply. Despite this importance, models that incorporate social influences are rare for two reasons:  because social network data has been difficult to collect, and because there has not been a convenient econometric framework to apply.
+
+However, both of these situations are changing. Usage of online social networking sites and other social media continues to grow, and contains social connection and preference data for  millions of individuals. On the econometric front, the spatial econometrics literature in the last twenty-plus years [@Anselin2003; @Anselin2011] enables the view of spatial interaction as a special case of social interaction, or as a proxy that may be more easily observed in data.
+
+In this paper, we develop and apply a technique that uses spatial data to analyze airline travel (trip frequency)  of individuals in a common social network. To do this, we construct a series of social weights matrices representing potential relationship strength between members of this network, and incorporate these matrices in a social Durbin model capturing direct, indirect, and endogenous effects. 
+
+The paper is organized as follows: Section 2 presents the literature establishing spatial/social econometrics as well as previous studies establishing the effect of social networks on travel behavior. Section 3 presents our model and the training data that we collected from a sample of undergraduate students (specifically those in the fraternity and sorority, or "Greek," system), with results from the model presented in Section 4. Section 5 concludes the paper with implications for future practice and research.
