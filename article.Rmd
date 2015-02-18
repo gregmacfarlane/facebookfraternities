@@ -42,12 +42,12 @@ Another dimension of individual behavior that is receiving increasing attention
 from transportation researchers is the role that peer or social networks play in
 travel choices. These influences may come in several ways:
 
-	- *Direct*: each individual chooses activities or destinations where their
-	  social connections are, or where they will be.
-	- *Indirect*: an individual’s social connections influence their choice of
-	  destinations or activities.
-	- *Endogenous*: individuals construct their social networks with others of
-	  shared interest or experience.
+  - *Direct*: each individual chooses activities or destinations where their
+  social connections are, or where they will be.
+  - *Indirect*: an individual’s social connections influence their choice of
+  destinations or activities.
+  - *Endogenous*: individuals construct their social networks with others of
+  shared interest or experience.
   
 The distinction between these elements can be subtle. Imagine two individuals who
 are socially connected to each other. If these individuals meet for dinner, this
@@ -158,16 +158,16 @@ types of data contained in that dataset, that are particularly relevant to the
 consideration of socio-spatial influences. Lewis et al. (2008) discusses
 five defining features of the Facebook social network model:   
 
-	1. Naturally Occurring:  Facebook data is naturally occurring when downloaded
-     directly from Facebook (i.e. not subject to a respondent recollection ability) 
-	2. Whole Networks: Facebook.com contains complete network data of a
-     sociocentric nature, as opposed to an egocentric nature, which reflects the
-     interconnectedness of network members
-	3. Longitudinal Data: Facebook data may reflect how relationships grow and
-     change over time; 
-	4. Cultural Insight: Facebook users can indicate tastes and values, which may
-     be reflected in the data 
-	5. Relationship Strength: Facebook can provide data on relationship strength.  
+  1. Naturally Occurring:  Facebook data is naturally occurring when downloaded
+directly from Facebook (i.e. not subject to a respondent recollection ability) 
+  2. Whole Networks: Facebook.com contains complete network data of a
+sociocentric nature, as opposed to an egocentric nature, which reflects the
+interconnectedness of network members
+  3. Longitudinal Data: Facebook data may reflect how relationships grow and
+change over time; 
+  4. Cultural Insight: Facebook users can indicate tastes and values, which may
+be reflected in the data 
+  5. Relationship Strength: Facebook can provide data on relationship strength.  
 
 Several of these items, as well as the types of data contained in Facebook
 datasets are particularly relevant to the consideration of socio-spatial
@@ -186,44 +186,47 @@ Spatial Econometrics
 Spatial econometrics is built on the understanding that observations near to
 each other spatially are likely to exhibit correlation and interdependence, as
 they share common unobserved variables and influence each other. A class of
-models developed to solve these problems was pioneered by Anselin (1988);
-LeSage & Pace (2009) provide a full and modern treatment. 
+models developed to solve these problems was pioneered by @Anselin1988;
+@LeSage2009 provide a full and modern treatment. 
 
 For a linear regression model , a necessary assumption is that the observations
 are independent, which is unlikely in spatial data. Tobler’s law implies that if
 two observations are “close” to each other, then they are likely to share common
-characteristics (Tobler 1970). Further, observations close to each other may
+characteristics [@Tobler1970]. Further, observations close to each other may
 actually exert an influence on each other in the way air pollution lowers the
-price of nearby properties (Kim & Goldsmith 2008). If correlation and
+price of nearby properties [@Kim2008]. If correlation and
 interdependence are not controlled in an econometric model, then the model may
 return biased parameters and/or invalid hypothesis tests.
 
 This correlation and interdependence can be accommodated with a spatial Durbin
 model (SDM),
-
-where  is a spatial weights matrix in which each element  maps the spatial
-relationship between two observations  and ; if  and  are “neighbors,” then .
-The parameter  measures the dependence between  and , and the lagged independent
-variable coefficients in  contain the impact that attributes of  have on . 
+$$y = \rho W y + X\beta + WX\gamma + \epsilon$$
+where $W$ is a spatial weights matrix in which each element  maps the spatial
+relationship between two observations $i$ and $j$; if $i$ and $j$ are
+"neighbors," then $w_{ij} > 0$. The parameter $\rho$ measures the dependence
+between $y_i$ and $y_j$, and the lagged independent variable coefficients in
+$\gamma$ contain the impact that attributes of $j$ have on $y_i$. 
 
 Such spatial models have been applied to numerous different contexts, including
 transportation modeling and forecasting. In most if not all of these cases,
 however, spatial data is used as a proxy for an inferred social relationship.
-For example, Adjemian et al. (2010) observed that vehicle body types were
+For example, @Adjemian2010 observed that vehicle body types were
 spatially autocorrelated, with the authors inferring that neighbors may
-influence each other in choosing vehicle types. Similarly, Bhat et al.
-(2010) used spatial proximity as a means to study the social destinations of
-teenagers. In these and other cases, it may be more appropriate to use the
-social network directly, if the social network can be translated to a  matrix.
-This is effectively the approach of Bramoullé et al. (2009) and
-Calvó-Armengol et al, (2009), who showed that a student's school performance
-and physical activity level (respectively) are socially interdependent: students
-with studious or athletic friends tend to be so as well.
+influence each other in choosing vehicle types. Similarly, @Bhat2010b used
+spatial proximity as a means to study the social destinations of
+teenagers, assuming that teenagers who live more closely to each other are more
+likely to be in each other's social networks. In these and other cases, it may
+be more appropriate to use the social network directly, if the social network
+can be translated to a $W$ matrix. This is effectively the approach of
+@Bramoulle2009 and @Calvo-Armengol2009, who showed that a student's school
+performance and physical activity level (respectively) are socially
+interdependent: students with studious or athletic friends tend to be so as
+well.
 
 There are two primary difficulties in creating , one econometric and one
 practical. From an econometric standpoint, the researcher typically must specify
 exogenously. Though some common practices have emerged in the spatial literature
-(Dubin 1998), not all of these can be readily adopted to social networks.
+[@Dubin1998], not all of these can be readily adopted to social networks.
 This gap in the literature is one that we seek to fill with this study, by
 examining several possible  matrices that we construct from social network data.
 The practical difficulty is actually collecting that data, though this is
