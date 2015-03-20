@@ -250,40 +250,39 @@ interdependence and correlation in such model.
 Data Collection
 ----------------------------------------
 To examine the potential for influences to travel behavior between individuals’
-within an interconnected social network, a web-based survey was developed, and
-respondents were recruited through the Georgia Tech fraternity and sorority
+within an interconnected social network, we developed a web-based survey 
+and recruited respondents through the Georgia Tech fraternity and sorority
 system (a social network that may presumably have a proportionally higher level
-of interconnectedness), in partnership with the Georgia Tech Dean of Students,
-Office of Greek Affairs.  The web-based survey instrument was distributed via
-email to the primary points of contact for each fraternity and sorority on file
-at the Office of Greek Affairs.  Fraternities and sororities were asked to also
-encouraged to solicit responses from their alumni, thus, potentially increasing
-the sample population of approximatley 3,300 students in Greek housing.
-Fraternities and sororities were incentivized with the promise of a $500
-charitable contribution made on behalf of the fraternity and the sorority each
-with the highest participation.
+of interconnectedness than the general student population), in partnership with 
+the Georgia Tech Dean of Students, Office of Greek Affairs. We distributed the
+web-based survey instrument via email to the primary points of contact for each
+fraternity and sorority on file at the Office of Greek Affairs. To increase the 
+sampling frame potentially beyond the 3,300 currrent fraternity and sorority 
+members, we encouraged the organizations to solicit responses from their alumni
+groups. The fraternity and sorority with the highest response volumes each
+had a $500 donation made in their name to a national charitable organization.
 
 The online survey instrument was adapted from @Wall2014; a detailed description 
 of the instrument can be found there. The survey consists of three principal 
 components. The first component
 collected respondents’ air travel information from the past year – this includes
 a list of trips taken with origin and destination airports for round-trip,
-multi-destination, and one-way travel.  The second component collected
+multi-destination, and one-way travel. The second component collected
 socio-demographic information, including age, gender, income, education level,
-citizenship, occupation, and race.  The third component asked respondents to log
+citizenship, occupation, and race. The third component asked respondents to log
 in to their Facebook accounts, and the survey automatically collected data
 contained in the respondent's profile and friends list via the Facebook
-application programming interface (API).  This data included the hometown city
+application programming interface (API). This data included the hometown city
 and current city locations of the respondents, and also that of the respondents’
-friends.  The program also collected an encrypted (one way hash) version of the
+friends. The program also collected an encrypted (one way hash) version of the
 Facebook ID for all respondents and their friends.  This ensured subject
 anonymity while simultaneously allowing us to observe which
 respondents were friends with each other, as well as how many friends respondents
 have in common even if those common friends did not participate in the survey.
 
 ```{r load_user}
-user <- readRDS("data/clean/user.rds")
 trips <- readRDS("data/clean/trips.rds")
+user <- readRDS("data/clean/user.rds")
 friends <- readRDS("data/clean/friends.rds")
 ```
 
@@ -293,16 +292,14 @@ the perspective of the respondent's individual profile, it is limited in its
 data collection to "visible" user profile and friend data. That is, individuals'
 information that was restricted as a result of more stringent individual privacy
 settings would not be visible to the survey program. A consequence of this is
-potential for imbalance in privacy settings (and thus, data visibility) between
-two connections, is that friend connections may be observed as one-way in the
-data even though one-way friend connections are not possible on Facebook.
-
+that one-way friendships, may be observed in the data even though one-way 
+friend connections are not possible on Facebook.
 
 Facebook locational data (i.e., hometown and current city location) is not
 geocoded, and therefore required some post-processing prior to any analyses.
 Facebook location data were post-processed using R statistical programming
 language and ArcGIS 10.  The study analyzed respondents’ friends who do not
-consider Atlanta, Georgia as their hometown.  Friends’ hometown cities were
+consider Atlanta, Georgia as their hometown. Friends’ hometown cities were
 geocoded as point locations. To associate cities as within (or outside of) the
 Atlanta metropolitan region, circular buffers were created (using
 Hartsfield-Jackson Atlanta International airport as the centroid) at 25 mile
