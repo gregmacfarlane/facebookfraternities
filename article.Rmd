@@ -277,10 +277,16 @@ application programming interface (API).  This data included the hometown city
 and current city locations of the respondents, and also that of the respondents’
 friends.  The program also collected an encrypted (one way hash) version of the
 Facebook ID for all respondents and their friends.  This ensured subject
-anonymity while simultaneously allowing observations regarding 1) which
-respondents were friends with each other, and 2) how many friends respondents
-have in common, 3) identifying and limiting the potential for duplicate
-respondents. 
+anonymity while simultaneously allowing us to observe which
+respondents were friends with each other, as well as how many friends respondents
+have in common even if those common friends did not participate in the survey.
+
+```{r load_user}
+user <- readRDS("data/clean/user.rds")
+trips <- readRDS("data/clean/trips.rds")
+friends <- readRDS("data/clean/friends.rds")
+```
+
 
 Because the survey program collects Facebook profile and friends list data from
 the perspective of the respondent's individual profile, it is limited in its
@@ -288,8 +294,9 @@ data collection to "visible" user profile and friend data. That is, individuals'
 information that was restricted as a result of more stringent individual privacy
 settings would not be visible to the survey program. A consequence of this is
 potential for imbalance in privacy settings (and thus, data visibility) between
-two connections, is that friend connections may be  observed as one-way in the
+two connections, is that friend connections may be observed as one-way in the
 data even though one-way friend connections are not possible on Facebook.
+
 
 Facebook locational data (i.e., hometown and current city location) is not
 geocoded, and therefore required some post-processing prior to any analyses.

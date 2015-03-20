@@ -24,9 +24,11 @@ user <- user %>%
   mutate_each(funs(as.numeric(.)), age, friends, collected) %>%
   mutate(zip = sprintf("%05d", zip))
 
+saveRDS(user, file = "../data/clean/user.rds")
 
 # calculate trips for each user
 
 
+saveRDS(friends, file = "../data/clean/friends.rds")
 
 
