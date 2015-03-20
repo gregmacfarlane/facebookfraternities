@@ -189,8 +189,9 @@ they share common unobserved variables and influence each other. A class of
 models developed to solve these problems was pioneered by @Anselin1988;
 @LeSage2009 provide a full and modern treatment. 
 
-For a linear regression model , a necessary assumption is that the observations
-are independent, which is unlikely in spatial data. Tobler’s law implies that if
+For a linear regression model $y = X\beta + epsilon$, a necessary assumption is 
+that the observations are independent, which is unlikely in spatial data. 
+Tobler’s law suggests that if
 two observations are “close” to each other, then they are likely to share common
 characteristics [@Tobler1970]. Further, observations close to each other may
 actually exert an influence on each other in the way air pollution lowers the
@@ -223,17 +224,16 @@ performance and physical activity level (respectively) are socially
 interdependent: students with studious or athletic friends tend to be so as
 well.
 
-There are two primary difficulties in creating , one econometric and one
-practical. From an econometric standpoint, the researcher typically must specify
+There are two primary difficulties in creating $W$, one econometric and one
+practical. From an econometric standpoint, the researcher typically must specify $W$
 exogenously. Though some common practices have emerged in the spatial literature
 [@Dubin1998], not all of these can be readily adopted to social networks.
 This gap in the literature is one that we seek to fill with this study, by
-examining several possible  matrices that we construct from social network data.
-The practical difficulty is actually collecting that data, though this is
+examining several possible matrices that we construct from social network data.
+The practical difficulty is actually collecting such data, though this is
 becoming less difficult as interaction within social networks happens through
-online sites such as Facebook. We discuss this practical evolution in Section
-2.2.
-
+online sites such as Facebook. We discussed this practical evolution in Section
+2.1.
 
 Methodology
 ======================================
@@ -263,9 +263,9 @@ Fraternities and sororities were incentivized with the promise of a $500
 charitable contribution made on behalf of the fraternity and the sorority each
 with the highest participation.
 
-The online survey instrument was adapted from Wall et al (2014), and
-contains three principal components.  For a detailed description of the
-variables collected, refer to Wall et al. (2014).  The first component
+The online survey instrument was adapted from @Wall2014; a detailed description 
+of the instrument can be found there. The survey consists of three principal 
+components. The first component
 collected respondents’ air travel information from the past year – this includes
 a list of trips taken with origin and destination airports for round-trip,
 multi-destination, and one-way travel.  The second component collected
