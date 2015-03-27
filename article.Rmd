@@ -300,7 +300,6 @@ user <- readRDS("data/clean/user.rds")
 friends <- readRDS("data/clean/friends.rds")
 ```
 
-
 Because the survey program collects Facebook profile and friends list data from
 the perspective of the respondent's individual profile, it is limited in its
 data collection to "visible" user profile and friend data. That is, individuals'
@@ -326,13 +325,18 @@ collection) were considered for the analysis.
 
 Candidate Weighting Schema
 -----------------------------------------
-The social network data we retrieved from Facebook allow us to construct four social weights matrices, which we describe in this section. To aid this presentation, we must first establish some basic notation following elementary set theory. The set of friends of an individual $i$ is defined as $\phi_i$. The cardinality of this set is the number of friends, so therefore the quantity $|\phi_i \cup \phi_j|$ represents the number of friends that individuals $i$ and $j$ have in common. 
+The social network data we retrieved from Facebook allow us to construct at least
+four social weights matrices, which we describe in this section. To aid this 
+presentation, we must first establish some basic notation following elementary 
+set theory. The set of friends of an individual $i$ is defined as $\phi_i$. 
+The cardinality of this set is the number of friends, so therefore the quantity 
+$|\phi_i \cup \phi_j|$ represents the number of friends that individuals $i$ 
+and $j$ have in common. 
 
 ```{r connections_frame}
 friend_connections <- tbl_df(expand.grid(id_i = user$id, id_j = user$id)) %>%
   group_by(id_i, id_j)
 ```
-
 
 **Direct Friendship**
 This schema defines a simple binary matrix where a cell is nonzero if  and  are
@@ -352,7 +356,6 @@ check_friends <- function(id_i, id_j, user, friends){
 friend_connections <- friend_connections %>%
   mutate(direct = check_friends(id_i, id_j, user, friends))
 ```
-
 
 **Mutual Friendship**
 This schema defines a matrix where the cell value is the number of friends  and
@@ -422,12 +425,21 @@ By Facebook’s internal logic, each of these matrices must be symmetric: it is
 not possible on Facebook to have non-reciprocal friends. However, the individual
 user privacy settings make it possible that we would observe apparent one-way
 relationships through the API; indeed, this affected approximately 10% of cases.
-We therefore coerce this and other schema to be symmetric as appropriate.
+We therefore coerced all schemata to be symmetric as appropriate.
 
-As a final note on the schema development, behavioral inference on and
+```{r force_symmetric}
+# still need to implement
+```
+
+As a final note on the schemata development, behavioral inference on and
 estimation of the models is simplified by using a row-standardized matrix, where
-the rows sum to unity(LeSage & Pace 2009, p.85). We follow this convention
+the rows sum to unity(LeSage & Pace 2009, p.85). We follow this convention
 in all cases.
+
+```{r save_as_matrices}
+
+```
+
 
 
 Results and Discussion
