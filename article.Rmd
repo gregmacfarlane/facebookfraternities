@@ -326,16 +326,13 @@ collection) were considered for the analysis.
 
 Candidate Weighting Schema
 -----------------------------------------
-The social network data we retrieved from Facebook allow us to construct four
-social weights matrices, which we describe in this section. To aid this
-presentation, we must first establish some basic notation following elementary
-set theory. The set of friends of an individual  is defined as . The cardinality
-of this set is the number of friends, so therefore the quantity  represents the
-number of friends that individuals  and  have in common.
+The social network data we retrieved from Facebook allow us to construct four social weights matrices, which we describe in this section. To aid this presentation, we must first establish some basic notation following elementary set theory. The set of friends of an individual $i$ is defined as $\phi_i$. The cardinality of this set is the number of friends, so therefore the quantity $|\phi_i \cup \phi_j|$ represents the number of friends that individuals $i$ and $j$ have in common. 
+
 ```{r connections_frame}
 friend_connections <- tbl_df(expand.grid(id_i = user$id, id_j = user$id)) %>%
   group_by(id_i, id_j)
 ```
+
 
 **Direct Friendship**
 This schema defines a simple binary matrix where a cell is nonzero if  and  are
@@ -355,9 +352,14 @@ check_friends <- function(id_i, id_j, user, friends){
 friend_connections <- friend_connections %>%
   mutate(direct = check_friends(id_i, id_j, user, friends))
 ```
+
+
 **Mutual Friendship**
 This schema defines a matrix where the cell value is the number of friends  and
-have in common (as in Gilbert & Karahalios 2009; He et al. 2012),
+have in common (as in Gilbert & Karahalios 2009; He et al. 2012),
+
+$$ w_{ij} = |\phi_i \cup \phi_j| $$
+
 ```{r mutual_friends}
 count_mutual_friends <- function(id_i, id_j, friends){
   length(intersect(
@@ -371,9 +373,13 @@ friend_connections <- friend_connections %>%
   mutate(mutual = count_mutual_friends(id_i, id_j, friends))
 ```
 
+
 **Network Overlap**
 This schema defines a matrix where the cell value is the relative overlap of
-each  pair’s social network (as in Adamic & Adar 2003),
+each pair’s social network (as in Adamic & Adar 2003),
+
+$$ w_{ij} = \frac{|\phi_i \cup \phi_j|} {|\phi_i \cap \phi_j|} $$
+
 ```{r network_overlap}
 calculate_newtork_overlap <- function(id_i, id_j, friends){
   mutual <- length(intersect( 
@@ -394,13 +400,23 @@ friend_connections <- friend_connections %>%
   mutate(overlap = calculate_newtork_overlap(id_i, id_j, friends))
 ```
 
+
 **Direct Network Overlap**
-This schema is similar to the Network Overlap, except that we give a bonus to
-pairs that are themselves friends,
+This schema is the sum of the network overlap and direct friends schemata:
+
+$$ w_{ij} =
+  \begin{cases}
+    \frac{|\phi_i \cup \phi_j|} {|\phi_i \cap \phi_j|} + 1 & 
+      \text{if } i \in \phi_j \\
+    \frac{|\phi_i \cup \phi_j|} {|\phi_i \cap \phi_j|}      & 
+      \text{if } i \notin \phi_j
+  \end{cases} $$
+
 ```{r direct_network_overlap}
 friend_connections <- friend_connections %>%
   mutate( direct_overlap = overlap + direct )
 ```
+
 
 By Facebook’s internal logic, each of these matrices must be symmetric: it is
 not possible on Facebook to have non-reciprocal friends. However, the individual

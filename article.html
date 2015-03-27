@@ -57,6 +57,19 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </div>
 
 
+<pre class="r"><code>library(knitr) # nice output tables
+
+# knit options
+opts_chunk$set(
+  cache = TRUE, cache.path = &quot;./.cache/&quot;,
+  echo = TRUE, 
+  fig.keep = TRUE, fig.path = &quot;./.figs/&quot;
+)
+
+library(dplyr, warn.conflicts = FALSE) # super data wrangling
+library(igraph) # graph analysis
+library(networkD3) # interactive graph visualizer</code></pre>
+<pre><code>## Warning: package 'networkD3' was built under R version 3.1.3</code></pre>
 <p><strong>Abstract</strong> Social networks can influence travel in two distinct ways: first, people often make trips to see people they know through work or life (exogenous effects); or they make trips that are similar to those taken by friends or family (endogenous effects). In spite of this, traditional models have not always made use of social network data, because information on social networks is both difficult to collect and challenging to implement in models. In this paper, we appropriate techniques developed for spatial data (specifically, a spatial Durbin count model) to construct a trip generation model for socially linked observations. We train this model on data collected through a web survey that interacts with the Facebook application programming interface (API) to capture respondents’ “friends” lists. We construct a set of “social weights” matrices that captures the social tie-strength between observations. A matrix that weights two observations by the number of their mutual friends provides the maximum model likelihood; this model further suggests that a non-social model may result in erroneous interpretations of the link between demographic characteristics and trip generation.</p>
 <div id="introduction" class="section level1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
@@ -116,11 +129,62 @@ friends &lt;- readRDS(&quot;data/clean/friends.rds&quot;)</code></pre>
 </div>
 <div id="candidate-weighting-schema" class="section level2">
 <h2><span class="header-section-number">3.2</span> Candidate Weighting Schema</h2>
-<p>The social network data we retrieved from Facebook allow us to construct four social weights matrices, which we describe in this section. To aid this presentation, we must first establish some basic notation following elementary set theory. The set of friends of an individual is defined as . The cardinality of this set is the number of friends, so therefore the quantity represents the number of friends that individuals and have in common.</p>
+<p>The social network data we retrieved from Facebook allow us to construct four social weights matrices, which we describe in this section. To aid this presentation, we must first establish some basic notation following elementary set theory. The set of friends of an individual <span class="math">\(i\)</span> is defined as <span class="math">\(\phi_i\)</span>. The cardinality of this set is the number of friends, so therefore the quantity <span class="math">\(|\phi_i \cup \phi_j|\)</span> represents the number of friends that individuals <span class="math">\(i\)</span> and <span class="math">\(j\)</span> have in common.</p>
+<pre class="r"><code>friend_connections &lt;- tbl_df(expand.grid(id_i = user$id, id_j = user$id)) %&gt;%
+  group_by(id_i, id_j)</code></pre>
 <p><strong>Direct Friendship</strong> This schema defines a simple binary matrix where a cell is nonzero if and are friends. Specifically,</p>
-<p><strong>Mutual Friendship</strong> This schema defines a matrix where the cell value is the number of friends and have in common (as in Gilbert &amp; Karahalios 2009; He et al. 2012),</p>
-<p><strong>Network Overlap</strong> This schema defines a matrix where the cell value is the relative overlap of each pair’s social network (as in Adamic &amp; Adar 2003),</p>
-<p><strong>Direct Network Overlap</strong> This schema is similar to the Network Overlap, except that we give a bonus to pairs that are themselves friends,</p>
+<p><span class="math">\[ w_{ij} =
+  \begin{cases}
+   1 &amp; \text{if } i \in \phi_j \\
+   0 &amp; \text{if } i \notin \phi_j
+  \end{cases} \]</span></p>
+<pre class="r"><code>check_friends &lt;- function(id_i, id_j, user, friends){
+  sum(user$fbid[user$id == id_i] %in% friends$fbid[friends$id == id_j])
+}
+
+friend_connections &lt;- friend_connections %&gt;%
+  mutate(direct = check_friends(id_i, id_j, user, friends))</code></pre>
+<p><strong>Mutual Friendship</strong> This schema defines a matrix where the cell value is the number of friends and have in common (as in Gilbert &amp; Karahalios 2009; He et al. 2012),</p>
+<p><span class="math">\[ w_{ij} = |\phi_i \cup \phi_j| \]</span></p>
+<pre class="r"><code>count_mutual_friends &lt;- function(id_i, id_j, friends){
+  length(intersect(
+  # sets of friend ids
+    friends$fbid[friends$id == id_i],
+    friends$fbid[friends$id == id_j]
+  ))
+}
+
+friend_connections &lt;- friend_connections %&gt;%
+  mutate(mutual = count_mutual_friends(id_i, id_j, friends))</code></pre>
+<p><strong>Network Overlap</strong> This schema defines a matrix where the cell value is the relative overlap of each pair’s social network (as in Adamic &amp; Adar 2003),</p>
+<p><span class="math">\[ w_{ij} = \frac{|\phi_i \cup \phi_j|} {|\phi_i \cap \phi_j|} \]</span></p>
+<pre class="r"><code>calculate_newtork_overlap &lt;- function(id_i, id_j, friends){
+  mutual &lt;- length(intersect( 
+    # sets of friend ids
+    friends$fbid[friends$id == id_i],
+    friends$fbid[friends$id == id_j]
+  ))
+  
+  total &lt;- length(union( 
+    friends$fbid[friends$id == id_i],
+    friends$fbid[friends$id == id_j]
+  ))
+  
+  mutual/total
+}
+
+friend_connections &lt;- friend_connections %&gt;%
+  mutate(overlap = calculate_newtork_overlap(id_i, id_j, friends))</code></pre>
+<p><strong>Direct Network Overlap</strong> This schema is the sum of the network overlap and direct friends schemae:</p>
+<p><span class="math">\[ w_{ij} =
+  \begin{cases}
+    \frac{|\phi_i \cup \phi_j|} {|\phi_i \cap \phi_j|} + 1 &amp; 
+      \text{if } i \in \phi_j \\
+    \frac{|\phi_i \cup \phi_j|} {|\phi_i \cap \phi_j|}      &amp; 
+      \text{if } i \notin \phi_j
+  \end{cases} \]</span></p>
+<pre class="r"><code>friend_connections &lt;- friend_connections %&gt;%
+  mutate( direct_overlap = overlap + direct )</code></pre>
 <p>By Facebook’s internal logic, each of these matrices must be symmetric: it is not possible on Facebook to have non-reciprocal friends. However, the individual user privacy settings make it possible that we would observe apparent one-way relationships through the API; indeed, this affected approximately 10% of cases. We therefore coerce this and other schema to be symmetric as appropriate.</p>
 <p>As a final note on the schema development, behavioral inference on and estimation of the models is simplified by using a row-standardized matrix, where the rows sum to unity(LeSage &amp; Pace 2009, p.85). We follow this convention in all cases.</p>
 </div>
