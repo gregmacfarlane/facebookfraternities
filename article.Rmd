@@ -8,6 +8,20 @@ output:
     fig_caption: yes
     number_sections: yes
 ---
+```{r setup}
+library(knitr) # nice output tables
+
+# knit options
+opts_chunk$set(
+  cache = TRUE, cache.path = "./.cache/",
+  echo = TRUE, 
+  fig.keep = TRUE, fig.path = "./.figs/"
+)
+
+library(dplyr, warn.conflicts = FALSE) # super data wrangling
+library(igraph) # graph analysis
+library(networkD3) # interactive graph visualizer
+```
 
 **Abstract**
 Social networks can influence travel in two distinct ways: first, people often
@@ -318,22 +332,75 @@ presentation, we must first establish some basic notation following elementary
 set theory. The set of friends of an individual  is defined as . The cardinality
 of this set is the number of friends, so therefore the quantity  represents the
 number of friends that individuals  and  have in common.
+```{r connections_frame}
+friend_connections <- tbl_df(expand.grid(id_i = user$id, id_j = user$id)) %>%
+  group_by(id_i, id_j)
+```
 
 **Direct Friendship**
 This schema defines a simple binary matrix where a cell is nonzero if  and  are
 friends. Specifically,
 
+$$ w_{ij} =
+  \begin{cases}
+   1 & \text{if } i \in \phi_j \\
+   0 & \text{if } i \notin \phi_j
+  \end{cases} $$
+
+```{r direct_friends_graph}
+check_friends <- function(id_i, id_j, user, friends){
+  sum(user$fbid[user$id == id_i] %in% friends$fbid[friends$id == id_j])
+}
+
+friend_connections <- friend_connections %>%
+  mutate(direct = check_friends(id_i, id_j, user, friends))
+```
 **Mutual Friendship**
 This schema defines a matrix where the cell value is the number of friends  and
 have in common (as in Gilbert & Karahalios 2009; He et al. 2012),
+```{r mutual_friends}
+count_mutual_friends <- function(id_i, id_j, friends){
+  length(intersect(
+  # sets of friend ids
+    friends$fbid[friends$id == id_i],
+    friends$fbid[friends$id == id_j]
+  ))
+}
+
+friend_connections <- friend_connections %>%
+  mutate(mutual = count_mutual_friends(id_i, id_j, friends))
+```
 
 **Network Overlap**
 This schema defines a matrix where the cell value is the relative overlap of
 each  pair’s social network (as in Adamic & Adar 2003),
+```{r network_overlap}
+calculate_newtork_overlap <- function(id_i, id_j, friends){
+  mutual <- length(intersect( 
+    # sets of friend ids
+    friends$fbid[friends$id == id_i],
+    friends$fbid[friends$id == id_j]
+  ))
+  
+  total <- length(union( 
+    friends$fbid[friends$id == id_i],
+    friends$fbid[friends$id == id_j]
+  ))
+  
+  mutual/total
+}
+
+friend_connections <- friend_connections %>%
+  mutate(overlap = calculate_newtork_overlap(id_i, id_j, friends))
+```
 
 **Direct Network Overlap**
 This schema is similar to the Network Overlap, except that we give a bonus to
 pairs that are themselves friends,
+```{r direct_network_overlap}
+friend_connections <- friend_connections %>%
+  mutate( direct_overlap = overlap + direct )
+```
 
 By Facebook’s internal logic, each of these matrices must be symmetric: it is
 not possible on Facebook to have non-reciprocal friends. However, the individual
