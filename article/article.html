@@ -175,7 +175,7 @@ friend_connections &lt;- friend_connections %&gt;%
 
 friend_connections &lt;- friend_connections %&gt;%
   mutate(overlap = calculate_newtork_overlap(id_i, id_j, friends))</code></pre>
-<p><strong>Direct Network Overlap</strong> This schema is the sum of the network overlap and direct friends schemae:</p>
+<p><strong>Direct Network Overlap</strong> This schema is the sum of the network overlap and direct friends schemata:</p>
 <p><span class="math">\[ w_{ij} =
   \begin{cases}
     \frac{|\phi_i \cup \phi_j|} {|\phi_i \cap \phi_j|} + 1 &amp; 

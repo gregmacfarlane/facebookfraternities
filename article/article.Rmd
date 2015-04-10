@@ -88,7 +88,8 @@ connection and preference data for  millions of individuals. On the econometric
 front, the spatial econometrics literature in the last twenty-plus years
 [@Anselin2003; @Anselin2011] enables the view of spatial interaction as
 a special case of social interaction, or as a proxy that may be more easily
-observed in data.
+observed in data. In other words, the spatial relationships that many authors
+have observed are often substitutes for implied social relationships.
 
 In this paper, we develop and apply a technique that uses spatial data to
 analyze airline travel (trip frequency)  of individuals in a common social
@@ -174,7 +175,7 @@ five defining features of the Facebook social network model:
 
   1. Naturally Occurring:  Facebook data is naturally occurring when downloaded
 directly from Facebook (i.e. not subject to a respondent recollection ability) 
-  2. Whole Networks: Facebook.com contains complete network data of a
+  2. Whole Networks: Facebook contains complete network data of a
 sociocentric nature, as opposed to an egocentric nature, which reflects the
 interconnectedness of network members
   3. Longitudinal Data: Facebook data may reflect how relationships grow and
@@ -193,6 +194,9 @@ provides some insight into the function of relationships, as may be related to
 the level of indirect influence across a relationship.  Lastly, and very
 importantly, Facebook maintains locational information that can easily be
 translated to geospatial   
+
+Tie Strength
+---------------------------------------
 
 
 Spatial Econometrics
@@ -300,6 +304,17 @@ user <- readRDS("data/clean/user.rds")
 friends <- readRDS("data/clean/friends.rds")
 ```
 
+```{r number_trips}
+#calculate number of user trips
+number_trips <- trips %>%
+  group_by(id) %>%
+  summarise(number_trips = n())
+
+user <- user %>%
+  left_join(number_trips)
+```
+
+
 Because the survey program collects Facebook profile and friends list data from
 the perspective of the respondent's individual profile, it is limited in its
 data collection to "visible" user profile and friend data. That is, individuals'
@@ -308,20 +323,16 @@ settings would not be visible to the survey program. A consequence of this is
 that one-way friendships, may be observed in the data even though one-way 
 friend connections are not possible on Facebook.
 
-Facebook locational data (i.e., hometown and current city location) is not
-geocoded, and therefore required some post-processing prior to any analyses.
-Facebook location data were post-processed using R statistical programming
-language and ArcGIS 10.  The study analyzed respondents’ friends who do not
-consider Atlanta, Georgia as their hometown. Friends’ hometown cities were
-geocoded as point locations. To associate cities as within (or outside of) the
-Atlanta metropolitan region, circular buffers were created (using
-Hartsfield-Jackson Atlanta International airport as the centroid) at 25 mile
-radius increments from 25 miles to 150 miles. The 6 resulting hometown buffer
-regions were then associated with the geocoded city locations, and thus the
-number of friends with hometown city locations within each buffer region were
-determined. Only data from respondents that completed the entire survey (i.e.
-the air travel diary, socio-demographic section, and the Facebook data
-collection) were considered for the analysis.
+***discussion of why we care about how far friends are from Atlanta***
+
+```{r distance_from_atlanta}
+cities <- read.csv("data/PRIVATEDATA/geocode/geocoded_datatables/allcities.csv")%>%
+  tbl_df()
+
+
+```
+
+
 
 Candidate Weighting Schema
 -----------------------------------------
