@@ -19,6 +19,7 @@ opts_chunk$set(
 )
 
 library(dplyr, warn.conflicts = FALSE) # super data wrangling
+library(tidyr)
 library(igraph) # graph analysis
 library(networkD3) # interactive graph visualizer
 ```
@@ -298,10 +299,8 @@ anonymity while simultaneously allowing us to observe which
 respondents were friends with each other, as well as how many friends respondents
 have in common even if those common friends did not participate in the survey.
 
-```{r load_user}
-trips <- readRDS("data/clean/trips.rds")
-user <- readRDS("data/clean/user.rds")
-friends <- readRDS("data/clean/friends.rds")
+```{r load_user, warning=FALSE}
+source("../rscripts/datacleaner.R")
 ```
 
 ```{r number_trips}
@@ -438,8 +437,17 @@ user privacy settings make it possible that we would observe apparent one-way
 relationships through the API; indeed, this affected approximately 10% of cases.
 We therefore coerced all schemata to be symmetric as appropriate.
 
-```{r force_symmetric}
-# still need to implement
+```{r save_as_matrices}
+# make graph
+user_graph <- graph.data.frame(friend_connections)
+
+# export graph edges as adjacency matrix
+matrix_list <- list()
+for(i in names(friend_connections)[-(1:2)]){
+  matrix_list[[i]] <- get.adjacency(user_graph, type = "both", i)
+  
+  # TODO force symmetric
+}
 ```
 
 As a final note on the schemata development, behavioral inference on and
@@ -447,9 +455,6 @@ estimation of the models is simplified by using a row-standardized matrix, where
 the rows sum to unity(LeSage & Pace 2009, p.85). We follow this convention
 in all cases.
 
-```{r save_as_matrices}
-
-```
 
 
 
