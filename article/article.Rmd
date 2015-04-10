@@ -6,6 +6,7 @@ csl: bibliography/elsevier-harvard.csl
 output:
   html_document:
     fig_caption: yes
+    theme: journal
     number_sections: yes
 ---
 ```{r setup}
@@ -324,7 +325,7 @@ friend connections are not possible on Facebook.
 
 ***discussion of why we care about how far friends are from Atlanta***
 
-```{r distance_from_atlanta}
+```{r distance_from_atlanta, eval=FALSE}
 cities <- read.csv("data/PRIVATEDATA/geocode/geocoded_datatables/allcities.csv")%>%
   tbl_df()
 
@@ -349,8 +350,8 @@ friend_connections <- tbl_df(expand.grid(id_i = user$id, id_j = user$id)) %>%
 ```
 
 **Direct Friendship**
-This schema defines a simple binary matrix where a cell is nonzero if  and  are
-friends. Specifically,
+This schema defines a simple binary matrix where a cell is nonzero if $i$ and 
+$j$ are friends. Specifically,
 
 $$ w_{ij} =
   \begin{cases}
@@ -368,8 +369,8 @@ friend_connections <- friend_connections %>%
 ```
 
 **Mutual Friendship**
-This schema defines a matrix where the cell value is the number of friends  and
-have in common (as in Gilbert & Karahalios 2009; He et al. 2012),
+This schema defines a matrix where the cell value is the number of friends $i$
+and $j$ have in common [as in @Gilbert2009; @He2012],
 
 $$ w_{ij} = |\phi_i \cup \phi_j| $$
 
@@ -389,7 +390,7 @@ friend_connections <- friend_connections %>%
 
 **Network Overlap**
 This schema defines a matrix where the cell value is the relative overlap of
-each pair’s social network (as in Adamic & Adar 2003),
+each pair’s social network [as in @Adamic2003],
 
 $$ w_{ij} = \frac{|\phi_i \cup \phi_j|} {|\phi_i \cap \phi_j|} $$
 
