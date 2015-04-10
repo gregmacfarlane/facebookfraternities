@@ -1,17 +1,18 @@
 # Load and do basic data munging on fraternity surveys.
 library(dplyr)
+library(readr)
 library(data.table)
 library(igraph)
 
-# Load user data and trim to useable fields
-user <- read.csv("../data/PRIVATEDATA/user.csv", stringsAsFactors = FALSE) %>%
+# Clean user table
+user <- tbl_df(read_csv("../data/PRIVATEDATA/user.csv")) %>%
   select(
-    id, fb_id, zip, location_from, lives_in, age, gender, race,
-    friend_list_size, collected_friends_size
-    ) %>%
+    id, fb_id, zip, location_from, lives_in, age, gender, race, 
+    collected_friends_size, fraternity_id
+    )  %>%
   setnames(
-    c("id", "fbid", "zip", "from", "at", "age", "sex", "race", "friends", 
-      "collected")
+    c("id", "fbid", "zip", "from", "at", "age", "sex", "race", 
+      "collected", "fraternity_id")
     ) 
 
 # useable records must have friends collected
@@ -21,12 +22,37 @@ user <- user %>%
 
 # make sure numeric cols are num, character are chr
 user <- user %>%
-  mutate_each(funs(as.numeric(.)), age, friends, collected) %>%
+  mutate_each(funs(as.numeric(.)), age,  collected) %>%
   mutate(zip = sprintf("%05d", zip))
+
+# attach fraternity information
+user <- user %>%
+  left_join(read.csv("../data/fraternities.csv", colClasses = "character"))
+
 
 saveRDS(user, file = "../data/clean/user.rds")
 
-# calculate trips for each user
+
+# Clean trip data
+trips <- read_csv("../data/PRIVATEDATA/trip.csv") %>%
+  tbl_df()  %>%
+  select(
+    id = user_id, 
+    purpose, 
+    origin_airport = origin_airport_code, 
+    destination_airport = destination_airport_code) 
+
+saveRDS(trips, file = "../data/clean/trips.rds")
+
+# Clean friends data
+friends <- read_csv("../data/PRIVATEDATA/user_friends_info.csv") %>%
+  tbl_df() %>%
+  transmute(
+    fbid = fb_id,
+    id = user_id,
+    from = tolower(location_from),
+    at = tolower(lives_in)
+  )
 
 
 saveRDS(friends, file = "../data/clean/friends.rds")
