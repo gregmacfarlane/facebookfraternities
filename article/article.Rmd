@@ -260,12 +260,24 @@ Methodology
 We introduce social dependence into a Poisson count model that predicts the
 number of airline trips an individual makes as a function of his or her
 socioeconomic variables. The Poisson count model estimates the effect of
-dependent variables  on the conditional mean number of trips, . We consider
-social interaction in this model by suggesting that  (where  is the row of  that
-contains the weights for the neighbors of ). Our goal in this analysis is to
-recover a weighting scheme  that maximizes the model likelihood, and use this
-model to examine the inferential error that could result from ignoring social
-interdependence and correlation in such model.
+dependent variables $X_i$ on the conditional mean number of 
+trips, $\lambda_i = e^{X_i\beta}$. This mean in turn determines the probability 
+of a discrete number of event occurrences,
+
+$$P(y_i = y | X) = \frac{\lambda_i e^{-\lambda_i}}{y!}$$
+
+We consider the influence of social interaction in this model by suggesting
+
+$$\lambda_i = e^{\rho W_i y + X_i\beta + W_iX_i \gamma}$$.
+
+If the $\rho$ and $\gamma$ parameters are statistically significant, this 
+indicates air travel is *socially dependent*, or that it is influenced by factors
+that are socially dependent. Further, if the parameters on this model are 
+significantly different from the non-social model, it implies that a non-social
+model may return biased parameters and/or inaccurate inferences.
+
+### Software
+
 
 Data Collection
 ----------------------------------------
