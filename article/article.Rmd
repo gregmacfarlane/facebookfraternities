@@ -491,9 +491,9 @@ user_graph <- graph.data.frame(friend_connections)
 # export graph edges as adjacency matrix
 matrix_list <- list()
 for(i in names(friend_connections)[-(1:2)]){
-  matrix_list[[i]] <- get.adjacency(user_graph, type = "both", i)
-  
-  # TODO force symmetric
+  mat <- as.matrix(get.adjacency(user_graph, type = "both", i))
+  # force matrix to be symmetric
+  matrix_list[[i]] <- pmax(mat, t(mat))
 }
 ```
 
