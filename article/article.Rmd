@@ -312,7 +312,7 @@ anonymity while simultaneously allowing us to observe which
 respondents were friends with each other, as well as how many friends respondents
 have in common even if those common friends did not participate in the survey.
 
-```{r load_user, warning=FALSE}
+```{r load_user, warning=FALSE, cache = FALSE}
 source("../rscripts/datacleaner.R")
 ```
 
@@ -323,9 +323,10 @@ number_trips <- trips %>%
   summarise(number_trips = n())
 
 user <- user %>%
-  left_join(number_trips)
+  filter(!is.na(collected)) %>%
+  left_join(number_trips) %>%
+  mutate(number_trips = ifelse(is.na(number_trips), 0, number_trips))
 ```
-
 
 Because the survey program collects Facebook profile and friends list data from
 the perspective of the respondent's individual profile, it is limited in its
@@ -344,7 +345,40 @@ cities <- read.csv("data/PRIVATEDATA/geocode/geocoded_datatables/allcities.csv")
 
 ```
 
+```{r survey_summary, echo = FALSE}
+us <- user %>%
+  summarise(n = n(),
+            min_age = min(age, na.rm = TRUE),
+            max_age = max(age, na.rm = TRUE),
+            med_age = median(age, na.rm = TRUE),
+            n_other = sum(race == "Other"),
+            n_zero = sum(number_trips == 0),
+            n_one = sum(number_trips == 1),
+            n_two = sum(number_trips == 2),
+            n_three = sum(number_trips == 3),
+            n_fourplus = sum(number_trips >= 4)
+            )
+```
 
+```{r summary_table, echo = FALSE}
+t <- data_frame(
+  "Variable" = c("Users:", "Responses", "Used records", 
+                 "Minimum respondent age", "Median age", "Minorities",
+                 "Trips:", "Zero trips", "One trip", "Two trips", 
+                 "Three trips", "Four or more trips",
+                 "Friends:",
+                 "Total friends collected", "Unique friends",
+                 "Unique hometowns", "Unique current locations"),
+  " " = c("", n_collected, us$n, 
+          us$min_age, us$med_age,  us$n_other, 
+          "", us$n_zero, us$n_one, us$n_two, us$n_three, us$n_fourplus,
+          "",
+          nrow(friends), length(unique(friends$fbid)),
+          length(unique(friends$from)), length(unique(friends$at)))
+)
+kable(t)
+
+```
 
 Candidate Weighting Schema
 -----------------------------------------

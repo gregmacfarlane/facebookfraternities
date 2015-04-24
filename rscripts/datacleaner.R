@@ -15,10 +15,15 @@ user <- tbl_df(read_csv("../data/PRIVATEDATA/user.csv")) %>%
       "collected", "fraternity_id")
     ) 
 
+
 # useable records must have friends collected
+n_collected <- nrow(user)
 user <- user %>%
   mutate_each(funs(ifelse( . == "NULL", NA, .))) %>%
-  filter(collected > 0) 
+  filter(id > 147) %>%
+  mutate(
+    race = ifelse(race != "White" | is.na(race), "Other", "White")
+  )
 
 # make sure numeric cols are num, character are chr
 user <- user %>%
