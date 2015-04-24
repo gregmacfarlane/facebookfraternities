@@ -120,7 +120,14 @@ library(networkD3) # interactive graph visualizer</code></pre>
 </div>
 <div id="methodology" class="section level1">
 <h1><span class="header-section-number">3</span> Methodology</h1>
-<p>We introduce social dependence into a Poisson count model that predicts the number of airline trips an individual makes as a function of his or her socioeconomic variables. The Poisson count model estimates the effect of dependent variables on the conditional mean number of trips, . We consider social interaction in this model by suggesting that (where is the row of that contains the weights for the neighbors of ). Our goal in this analysis is to recover a weighting scheme that maximizes the model likelihood, and use this model to examine the inferential error that could result from ignoring social interdependence and correlation in such model.</p>
+<p>We introduce social dependence into a Poisson count model that predicts the number of airline trips an individual makes as a function of his or her socioeconomic variables. The Poisson count model estimates the effect of dependent variables <span class="math">\(X_i\)</span> on the conditional mean number of trips, <span class="math">\(\lambda_i = e^{X_i\beta}\)</span>. This mean in turn determines the probability of a discrete number of event occurrences,</p>
+<p><span class="math">\[P(y_i = y | X) = \frac{\lambda_i e^{-\lambda_i}}{y!}\]</span></p>
+<p>We consider the influence of social interaction in this model by suggesting</p>
+<p><span class="math">\[\lambda_i = e^{\rho W_i y + X_i\beta + W_iX_i \gamma}\]</span>.</p>
+<p>If the <span class="math">\(\rho\)</span> and <span class="math">\(\gamma\)</span> parameters are statistically significant, this indicates air travel is <em>socially dependent</em>, or that it is influenced by factors that are socially dependent. Further, if the parameters on this model are significantly different from the non-social model, it implies that a non-social model may return biased parameters and/or inaccurate inferences.</p>
+<div id="software" class="section level3">
+<h3><span class="header-section-number">3.0.1</span> Software</h3>
+</div>
 <div id="data-collection" class="section level2">
 <h2><span class="header-section-number">3.1</span> Data Collection</h2>
 <p>To examine the potential for influences to travel behavior between individuals’ within an interconnected social network, we developed a web-based survey and recruited respondents through the Georgia Tech fraternity and sorority system (a social network that may presumably have a proportionally higher level of interconnectedness than the general student population), in partnership with the Georgia Tech Dean of Students, Office of Greek Affairs. We distributed the web-based survey instrument via email to the primary points of contact for each fraternity and sorority on file at the Office of Greek Affairs. To increase the sampling frame potentially beyond the 3,300 currrent fraternity and sorority members, we encouraged the organizations to solicit responses from their alumni groups. The fraternity and sorority with the highest response volumes each had a $500 donation made in their name to a national charitable organization.</p>
@@ -140,12 +147,92 @@ number_trips &lt;- trips %&gt;%
   summarise(number_trips = n())
 
 user &lt;- user %&gt;%
-  left_join(number_trips)</code></pre>
+  filter(!is.na(collected)) %&gt;%
+  left_join(number_trips) %&gt;%
+  mutate(number_trips = ifelse(is.na(number_trips), 0, number_trips))</code></pre>
 <pre><code>## Joining by: &quot;id&quot;</code></pre>
 <p>Because the survey program collects Facebook profile and friends list data from the perspective of the respondent’s individual profile, it is limited in its data collection to “visible” user profile and friend data. That is, individuals’ information that was restricted as a result of more stringent individual privacy settings would not be visible to the survey program. A consequence of this is that one-way friendships, may be observed in the data even though one-way friend connections are not possible on Facebook.</p>
 <p><strong><em>discussion of why we care about how far friends are from Atlanta</em></strong></p>
 <pre class="r"><code>cities &lt;- read.csv(&quot;data/PRIVATEDATA/geocode/geocoded_datatables/allcities.csv&quot;)%&gt;%
   tbl_df()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Users:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Responses</td>
+<td align="left">196</td>
+</tr>
+<tr class="odd">
+<td align="left">Used records</td>
+<td align="left">55</td>
+</tr>
+<tr class="even">
+<td align="left">Minimum respondent age</td>
+<td align="left">18</td>
+</tr>
+<tr class="odd">
+<td align="left">Median age</td>
+<td align="left">19</td>
+</tr>
+<tr class="even">
+<td align="left">Minorities</td>
+<td align="left">5</td>
+</tr>
+<tr class="odd">
+<td align="left">Trips:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Zero trips</td>
+<td align="left">5</td>
+</tr>
+<tr class="odd">
+<td align="left">One trip</td>
+<td align="left">29</td>
+</tr>
+<tr class="even">
+<td align="left">Two trips</td>
+<td align="left">12</td>
+</tr>
+<tr class="odd">
+<td align="left">Three trips</td>
+<td align="left">4</td>
+</tr>
+<tr class="even">
+<td align="left">Four or more trips</td>
+<td align="left">5</td>
+</tr>
+<tr class="odd">
+<td align="left">Friends:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Total friends collected</td>
+<td align="left">40588</td>
+</tr>
+<tr class="odd">
+<td align="left">Unique friends</td>
+<td align="left">28756</td>
+</tr>
+<tr class="even">
+<td align="left">Unique hometowns</td>
+<td align="left">3926</td>
+</tr>
+<tr class="odd">
+<td align="left">Unique current locations</td>
+<td align="left">2384</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="candidate-weighting-schema" class="section level2">
 <h2><span class="header-section-number">3.2</span> Candidate Weighting Schema</h2>
