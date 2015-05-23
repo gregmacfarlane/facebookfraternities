@@ -339,11 +339,22 @@ friend connections are not possible on Facebook.
 ***discussion of why we care about how far friends are from Atlanta***
 
 ```{r distance_from_atlanta, eval=FALSE}
-cities <- read.csv("data/PRIVATEDATA/geocode/geocoded_datatables/allcities.csv")%>%
-  tbl_df()
+# how many friends are within different distances?
+friends_distance <- friends %>%
+  group_by(id) %>%
+  summarise(
+    friends_win_10 = sum(miles_from_atl < 10, na.rm = TRUE),
+    friends_win_25 = sum(miles_from_atl < 25, na.rm = TRUE),
+    friends_win_50 = sum(miles_from_atl < 50, na.rm = TRUE),
+    friends_win_100 = sum(miles_from_atl < 100, na.rm = TRUE)
+    )
 
-
+user <- user %>%
+  left_join(friends_distance)
 ```
+
+
+A descriptive summary of the data is given in Table .
 
 ```{r survey_summary, echo = FALSE}
 us <- user %>%
