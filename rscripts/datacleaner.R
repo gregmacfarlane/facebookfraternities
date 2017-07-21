@@ -1,22 +1,17 @@
 # Load and do basic data munging on fraternity surveys.
-library(dplyr)
-library(readr)
-library(data.table)
-library(igraph)
+library(tidyverse)
+library(here)
+
 
 # Clean user table -----
-user <- tbl_df(read_csv("../data/PRIVATEDATA/user.csv")) %>%
+user <- read_csv(here("data/PRIVATEDATA/user.csv")) %>%
   select(
-    id, fb_id, zip, location_from, lives_in, age, gender, race, 
-    collected_friends_size, fraternity_id
-    )  %>%
-  setnames(
-    c("id", "fbid", "zip", "from", "at", "age", "sex", "race", 
-      "collected", "fraternity_id")
-    ) %>%
+    id, fbid = fb_id, zip, from = location_from, at = lives_in, age, gender, race, 
+    collected = collected_friends_size, fraternity_id
+  ) %>%
 
   # useable records must have friends collected
-  mutate_each(funs(ifelse( . == "NULL", NA, .))) %>%
+  mutate_all(funs(ifelse( . == "NULL", NA, .))) %>%
   filter(id > 147) %>%
 
   # variable cleanup
@@ -26,19 +21,17 @@ user <- tbl_df(read_csv("../data/PRIVATEDATA/user.csv")) %>%
     at = tolower(at),
     zip = sprintf("%05d", zip) 
   ) %>%
-  mutate_each(funs(as.numeric(.)), age,  collected) %>%
+  mutate_at(vars(age, collected), funs(as.numeric(.))) %>%
   
   # attach fraternity information
-  left_join(read.csv("../data/fraternities.csv", colClasses = "character"))
+  left_join(read_csv(here("data/fraternities.csv"), col_types = "ccc"))
+
+n_collected <- nrow(user)
   
-
-
-
-#saveRDS(user, file = "../data/clean/user.rds")
 
 
 # Clean trip data ------
-trips <- read_csv("../data/PRIVATEDATA/trip.csv") %>%
+trips <- read_csv(here("data/PRIVATEDATA/trip.csv")) %>%
   tbl_df()  %>%
   select(
     id = user_id, 
@@ -58,7 +51,7 @@ get_miles_from_atl <- function (long2, lat2) {
 }
 
 # coordinates for the friends' cities
-cities <- read_csv("../data/PRIVATEDATA/geocode/geocoded_datatables/allcities.csv") %>%
+cities <- read_csv(here("data/PRIVATEDATA/geocode/geocoded_datatables/allcities.csv")) %>%
   tbl_df() %>%
   mutate(
     miles_from_atl = get_miles_from_atl(longitude, latitude),
@@ -70,8 +63,7 @@ cities <- read_csv("../data/PRIVATEDATA/geocode/geocoded_datatables/allcities.cs
 
 
 # Clean friends data -----
-friends <- read_csv("../data/PRIVATEDATA/user_friends_info.csv") %>%
-  tbl_df() %>%
+friends <- read_csv(here("data/PRIVATEDATA/user_friends_info.csv")) %>%
   transmute(
     fbid = fb_id,
     id = user_id,

@@ -11,18 +11,15 @@ output:
 ---
 ```{r setup}
 library(knitr) # nice output tables
+library(here)
 
 # knit options
 opts_chunk$set(
-  cache = TRUE, cache.path = "./.cache/",
+  cache = TRUE, cache.path = ".cache/",
   echo = TRUE, 
-  fig.keep = TRUE, fig.path = "./.figs/"
+  fig.keep = TRUE, fig.path = ".figs/"
 )
 
-library(dplyr, warn.conflicts = FALSE) # super data wrangling
-library(tidyr)
-library(igraph) # graph analysis
-library(networkD3) # interactive graph visualizer
 ```
 
 **Abstract**
@@ -313,7 +310,7 @@ respondents were friends with each other, as well as how many friends respondent
 have in common even if those common friends did not participate in the survey.
 
 ```{r load_user, warning=FALSE, cache = FALSE}
-source("../rscripts/datacleaner.R")
+source(here("rscripts/datacleaner.R"))
 ```
 
 ```{r number_trips}
@@ -368,7 +365,7 @@ us <- user %>%
             n_two = sum(number_trips == 2),
             n_three = sum(number_trips == 3),
             n_fourplus = sum(number_trips >= 4)
-            )
+  )
 ```
 
 ```{r summary_table, echo = FALSE}
@@ -497,12 +494,12 @@ We therefore coerced all schemata to be symmetric as appropriate.
 
 ```{r save_as_matrices}
 # make graph
-user_graph <- graph.data.frame(friend_connections)
+user_graph <- igraph::graph.data.frame(friend_connections)
 
 # export graph edges as adjacency matrix
 matrix_list <- list()
 for(i in names(friend_connections)[-(1:2)]){
-  mat <- as.matrix(get.adjacency(user_graph, type = "both", i))
+  mat <- as.matrix(igraph::get.adjacency(user_graph, type = "both", i))
   # force matrix to be symmetric
   matrix_list[[i]] <- pmax(mat, t(mat))
 }
